@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Earth Law Tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #f5f0e8;
+            color: #2c2c2c;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 30px 0 20px;
+            border-bottom: 2px solid #3a6b35;
+            margin-bottom: 30px;
+        }
+        header h1 {
+            color: #3a6b35;
+            font-size: 2em;
+            margin-bottom: 5px;
+        }
+        header p {
+            color: #666;
+            font-style: italic;
+        }
+        .article-count {
+            text-align: center;
+            color: #888;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+        .article {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: box-shadow 0.2s;
+        }
+        .article:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        }
+        .article-title a {
+            color: #2c2c2c;
+            text-decoration: none;
+            font-size: 1.15em;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+        .article-title a:hover {
+            color: #3a6b35;
+        }
+        .original-title {
+            color: #888;
+            font-size: 0.9em;
+            font-style: italic;
+            margin-top: 4px;
+        }
+        .article-meta {
+            margin-top: 8px;
+            font-size: 0.85em;
+            color: #666;
+        }
+        .outlet {
+            font-weight: bold;
+            color: #555;
+        }
+        .language-badge {
+            display: inline-block;
+            background: #3a6b35;
+            color: white;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            margin-left: 8px;
+            vertical-align: middle;
+        }
+        .translate-link {
+            color: #3a6b35;
+            font-size: 0.85em;
+            margin-left: 10px;
+        }
+        .search-term {
+            display: inline-block;
+            background: #e8f0e5;
+            color: #3a6b35;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            margin-top: 5px;
+        }
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+        .empty p { margin-bottom: 10px; }
+        .empty code {
+            background: #e0e0e0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Earth Law Tracker</h1>
+        <p>Rights of Nature &middot; Ecocide &middot; Earth Law</p>
+    </header>
+
+    {% if articles %}
+    <div class="article-count">{{ articles | length }} article{{ 's' if articles | length != 1 }} tracked</div>
+
+    {% for article in articles %}
+    <div class="article">
+        <div class="article-title">
+            {% if article.language != 'en' %}
+                <a href="{{ article.real_url or article.url }}" target="_blank" rel="noopener">{{ article.title_en }}</a>
+                <span class="language-badge">{{ article.language }}</span>
+                <a href="/read/{{ article.id }}" class="translate-link">Read translated</a>
+                <div class="original-title">{{ article.title }}</div>
+            {% else %}
+                <a href="{{ article.real_url or article.url }}" target="_blank" rel="noopener">{{ article.title }}</a>
+            {% endif %}
+        </div>
+        <div class="article-meta">
+            {% if article.language != 'en' and article.outlet_en and article.outlet_en != article.outlet %}
+                <span class="outlet">{{ article.outlet_en }}</span> ({{ article.outlet }})
+            {% else %}
+                <span class="outlet">{{ article.outlet }}</span>
+            {% endif %}
+            {% if article.author %}
+                &middot; <span class="author">{{ article.author }}</span>
+            {% endif %}
+            {% if article.date %}
+                &middot; {{ article.date }}
+            {% endif %}
+        </div>
+        <span class="search-term">{{ article.search_term }}</span>
+    </div>
+    {% endfor %}
+
+    {% else %}
+    <div class="empty">
+        <p>No articles yet.</p>
+        <p>Run <code>python fetch_articles.py</code> to fetch articles.</p>
+    </div>
+    {% endif %}
+</body>
+</html>

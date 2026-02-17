@@ -1,0 +1,35 @@
+databases:
+  - name: earth-law-db
+    plan: free
+    databaseName: earthlaw
+    user: earthlaw
+
+services:
+  - type: web
+    name: earth-law-tracker
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt && python -c "from db import init_db; init_db()"
+    startCommand: gunicorn app:app --bind 0.0.0.0:$PORT
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: earth-law-db
+          property: connectionURI
+      - key: PYTHON_VERSION
+        value: "3.11.6"
+
+  - type: cron
+    name: earth-law-fetcher
+    runtime: python
+    plan: free
+    schedule: "0 8 * * *"
+    buildCommand: pip install -r requirements.txt
+    startCommand: python fetch_articles.py
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: earth-law-db
+          property: connectionURI
+      - key: PYTHON_VERSION
+        value: "3.11.6"
