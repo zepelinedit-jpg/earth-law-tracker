@@ -55,12 +55,12 @@ def index():
     articles = load_articles()
     cutoff = datetime.now(tz=parse_date(articles[0]["date"]).tzinfo if articles else None) - timedelta(days=365)
     articles = [a for a in articles if parse_date(a.get("date", "")) > cutoff]
-    articles.sort(key=lambda a: parse_fetched_date(a.get("fetched_date", "")), reverse=True)
+    articles.sort(key=lambda a: parse_date(a.get("date", "")), reverse=True)
 
     groups = {}
     for a in articles:
-        fd = parse_fetched_date(a.get("fetched_date", ""))
-        label = fd.strftime("%B %Y") if fd != datetime.min else "Unknown"
+        pd = parse_date(a.get("date", ""))
+        label = pd.strftime("%B %Y") if pd != datetime.min else "Unknown"
         groups.setdefault(label, []).append(a)
 
     grouped_articles = list(groups.items())
