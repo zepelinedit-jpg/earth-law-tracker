@@ -107,6 +107,14 @@
             border-radius: 4px;
             font-size: 0.9em;
         }
+        .month-heading {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #3a6b35;
+            margin: 30px 0 12px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid #c8dcc4;
+        }
     </style>
 </head>
 <body>
@@ -115,9 +123,11 @@
         <p>Rights of Nature &middot; Ecocide &middot; Earth Law</p>
     </header>
 
-    {% if articles %}
-    <div class="article-count">{{ articles | length }} article{{ 's' if articles | length != 1 }} tracked</div>
+    {% if grouped_articles %}
+    <div class="article-count">{{ total }} article{{ 's' if total != 1 }} tracked</div>
 
+    {% for month_label, articles in grouped_articles %}
+    <div class="month-heading">{{ month_label }}</div>
     {% for article in articles %}
     <div class="article">
         <div class="article-title">
@@ -146,6 +156,7 @@
         <span class="search-term">{{ article.search_term }}</span>
     </div>
     {% endfor %}
+    {% endfor %}
 
     {% else %}
     <div class="empty">
@@ -153,5 +164,6 @@
         <p>Run <code>python fetch_articles.py</code> to fetch articles.</p>
     </div>
     {% endif %}
+
 </body>
 </html>

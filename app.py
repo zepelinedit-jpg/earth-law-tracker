@@ -43,13 +43,28 @@ def fetch_and_parse_article(url):
     return news.text, news.authors
 
 
+def parse_fetched_date(fetched_str):
+    try:
+        return datetime.fromisoformat(fetched_str)
+    except Exception:
+        return datetime.min
+
+
 @app.route("/")
 def index():
     articles = load_articles()
     cutoff = datetime.now(tz=parse_date(articles[0]["date"]).tzinfo if articles else None) - timedelta(days=365)
     articles = [a for a in articles if parse_date(a.get("date", "")) > cutoff]
-    articles.sort(key=lambda a: parse_date(a.get("date", "")), reverse=True)
-    return render_template("index.html", articles=articles)
+    articles.sort(key=lambda a: parse_fetched_date(a.get("fetched_date", "")), reverse=True)
+
+    groups = {}
+    for a in articles:
+        fd = parse_fetched_date(a.get("fetched_date", ""))
+        label = fd.strftime("%B %Y") if fd != datetime.min else "Unknown"
+        groups.setdefault(label, []).append(a)
+
+    grouped_articles = list(groups.items())
+    return render_template("index.html", grouped_articles=grouped_articles, total=len(articles))
 
 
 @app.route("/read/<article_id>")
