@@ -124,6 +124,18 @@
             padding-bottom: 6px;
             border-bottom: 1px solid #c8dcc4;
         }
+        .keynote {
+            text-align: center;
+            color: #555;
+            font-style: italic;
+            padding: 14px 0;
+            margin-bottom: 0;
+        }
+        .divider {
+            border: none;
+            border-top: 2px solid #3a6b35;
+            margin: 0 0 24px;
+        }
         .search-bar {
             margin-bottom: 20px;
         }
@@ -154,6 +166,9 @@
         <h1>Earth Law Article Tracker</h1>
         <p>Rights of Nature &middot; Ecocide &middot; Human Environmental Rights</p>
     </header>
+
+    <p class="keynote">A global repository of Earth law news, updated twice-daily.</p>
+    <hr class="divider">
 
     {% if grouped_articles %}
     <div class="search-bar">
