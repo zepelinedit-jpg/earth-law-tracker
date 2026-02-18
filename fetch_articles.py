@@ -27,6 +27,8 @@ SEARCH_TERMS = [
     '"environmental personhood"',
     '"rights of rivers"',
     '"river rights"',
+    '"Indigenous environmental rights"',
+    '"bioregionalism"',
 ]
 
 GOOGLE_NEWS_RSS = "https://news.google.com/rss/search?q={query}&hl=en&gl=US&ceid=US:en"
