@@ -94,6 +94,15 @@
             border-radius: 4px;
             font-size: 0.75em;
             margin-top: 5px;
+            cursor: pointer;
+        }
+        .search-term:hover {
+            background: #3a6b35;
+            color: white;
+        }
+        .search-term.active {
+            background: #3a6b35;
+            color: white;
         }
         .empty {
             text-align: center;
@@ -156,7 +165,7 @@
     {% for month_label, articles in grouped_articles %}
     <div class="month-heading">{{ month_label }}</div>
     {% for article in articles %}
-    <div class="article">
+    <div class="article" data-term="{{ article.search_term }}">
         <div class="article-title">
             {% if article.language != 'en' %}
                 <a href="{{ article.real_url or article.url }}" target="_blank" rel="noopener">{{ article.title_en }}</a>
@@ -197,20 +206,25 @@
         const countEl = document.getElementById('article-count');
         const noResults = document.getElementById('no-results');
         const total = {{ total }};
+        let activeTag = null;
 
-        input.addEventListener('input', function () {
-            const q = this.value.trim().toLowerCase();
+        function applyFilter() {
+            const q = input.value.trim().toLowerCase();
             const articles = document.querySelectorAll('.article');
             const headings = document.querySelectorAll('.month-heading');
             let visible = 0;
 
             articles.forEach(function (el) {
-                const text = el.textContent.toLowerCase();
-                el.style.display = (!q || text.includes(q)) ? '' : 'none';
-                if (!q || text.includes(q)) visible++;
+                let show;
+                if (activeTag) {
+                    show = el.dataset.term === activeTag;
+                } else {
+                    show = !q || el.textContent.toLowerCase().includes(q);
+                }
+                el.style.display = show ? '' : 'none';
+                if (show) visible++;
             });
 
-            // Hide month headings with no visible articles beneath them
             headings.forEach(function (heading) {
                 let next = heading.nextElementSibling;
                 let hasVisible = false;
@@ -223,12 +237,40 @@
                 heading.style.display = hasVisible ? '' : 'none';
             });
 
-            if (q) {
-                countEl.textContent = visible + ' article' + (visible !== 1 ? 's' : '') + ' found';
-            } else {
-                countEl.textContent = total + ' article' + (total !== 1 ? 's' : '') + ' tracked';
-            }
-            noResults.style.display = (q && visible === 0) ? 'block' : 'none';
+            const filtering = activeTag || q;
+            countEl.textContent = filtering
+                ? visible + ' article' + (visible !== 1 ? 's' : '') + ' found'
+                : total + ' article' + (total !== 1 ? 's' : '') + ' tracked';
+            noResults.style.display = (filtering && visible === 0) ? 'block' : 'none';
+        }
+
+        input.addEventListener('input', function () {
+            // Typing clears any active tag filter
+            activeTag = null;
+            document.querySelectorAll('.search-term.active').forEach(function (el) {
+                el.classList.remove('active');
+            });
+            applyFilter();
+        });
+
+        document.querySelectorAll('.search-term').forEach(function (tag) {
+            tag.addEventListener('click', function () {
+                const term = this.closest('.article').dataset.term;
+                if (activeTag === term) {
+                    // Clicking the active tag again clears the filter
+                    activeTag = null;
+                    this.classList.remove('active');
+                    input.value = '';
+                } else {
+                    activeTag = term;
+                    document.querySelectorAll('.search-term.active').forEach(function (el) {
+                        el.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    input.value = '';
+                }
+                applyFilter();
+            });
         });
     </script>
 </body>
