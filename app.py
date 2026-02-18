@@ -53,18 +53,32 @@ def parse_fetched_date(fetched_str):
 @app.route("/")
 def index():
     articles = load_articles()
-    cutoff = datetime.now(tz=parse_date(articles[0]["date"]).tzinfo if articles else None) - timedelta(days=365)
-    articles = [a for a in articles if parse_date(a.get("date", "")) > cutoff]
+    tz = parse_date(articles[0]["date"]).tzinfo if articles else None
+    now = datetime.now(tz=tz)
+    cutoff_12m = now - timedelta(days=365)
+    cutoff_6m  = now - timedelta(days=182)
+
+    articles = [a for a in articles if parse_date(a.get("date", "")) > cutoff_12m]
     articles.sort(key=lambda a: parse_date(a.get("date", "")), reverse=True)
 
-    groups = {}
-    for a in articles:
-        pd = parse_date(a.get("date", ""))
-        label = pd.strftime("%B %Y") if pd != datetime.min else "Unknown"
-        groups.setdefault(label, []).append(a)
+    def make_groups(arts):
+        groups = {}
+        for a in arts:
+            pd = parse_date(a.get("date", ""))
+            label = pd.strftime("%B %Y") if pd != datetime.min else "Unknown"
+            groups.setdefault(label, []).append(a)
+        return list(groups.items())
 
-    grouped_articles = list(groups.items())
-    return render_template("index.html", grouped_articles=grouped_articles, total=len(articles))
+    recent  = [a for a in articles if parse_date(a.get("date", "")) > cutoff_6m]
+    older   = [a for a in articles if parse_date(a.get("date", "")) <= cutoff_6m]
+
+    return render_template(
+        "index.html",
+        recent_groups=make_groups(recent),
+        older_groups=make_groups(older),
+        total_recent=len(recent),
+        total_all=len(articles),
+    )
 
 
 @app.route("/read/<article_id>")

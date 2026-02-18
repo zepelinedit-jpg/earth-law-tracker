@@ -161,6 +161,20 @@
             padding: 40px 20px;
             color: #888;
         }
+        #load-more {
+            background: white;
+            color: #3a6b35;
+            border: 2px solid #3a6b35;
+            padding: 10px 28px;
+            font-size: 1em;
+            font-family: Georgia, 'Times New Roman', serif;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        #load-more:hover {
+            background: #3a6b35;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -172,14 +186,14 @@
     <p class="keynote">A global repository of Earth law news, updated twice-daily.</p>
     <hr class="divider">
 
-    {% if grouped_articles %}
+    {% if recent_groups or older_groups %}
     <div class="search-bar">
         <input type="search" id="search" placeholder="Search articles…" autocomplete="off">
     </div>
-    <div class="article-count" id="article-count">{{ total }} article{{ 's' if total != 1 }} tracked</div>
+    <div class="article-count" id="article-count">{{ total_recent }} article{{ 's' if total_recent != 1 }} tracked in the last 6 months</div>
     <div id="no-results">No articles match your search.</div>
 
-    {% for month_label, articles in grouped_articles %}
+    {% for month_label, articles in recent_groups %}
     <div class="month-heading">{{ month_label }}</div>
     {% for article in articles %}
     <div class="article" data-term="{{ article.search_term }}">
@@ -211,6 +225,45 @@
     {% endfor %}
     {% endfor %}
 
+    {% if older_groups %}
+    <div id="older-articles" style="display:none">
+        {% for month_label, articles in older_groups %}
+        <div class="month-heading">{{ month_label }}</div>
+        {% for article in articles %}
+        <div class="article" data-term="{{ article.search_term }}">
+            <div class="article-title">
+                {% if article.language != 'en' %}
+                    <a href="{{ article.real_url or article.url }}" target="_blank" rel="noopener">{{ article.title_en }}</a>
+                    <span class="language-badge">{{ article.language }}</span>
+                    <a href="/read/{{ article.id }}" class="translate-link">Read translated</a>
+                    <div class="original-title">{{ article.title }}</div>
+                {% else %}
+                    <a href="{{ article.real_url or article.url }}" target="_blank" rel="noopener">{{ article.title }}</a>
+                {% endif %}
+            </div>
+            <div class="article-meta">
+                {% if article.language != 'en' and article.outlet_en and article.outlet_en != article.outlet %}
+                    <span class="outlet">{{ article.outlet_en }}</span> ({{ article.outlet }})
+                {% else %}
+                    <span class="outlet">{{ article.outlet }}</span>
+                {% endif %}
+                {% if article.author %}
+                    &middot; <span class="author">{{ article.author }}</span>
+                {% endif %}
+                {% if article.date %}
+                    &middot; {{ article.date }}
+                {% endif %}
+            </div>
+            <span class="search-term">{{ article.search_term }}</span>
+        </div>
+        {% endfor %}
+        {% endfor %}
+    </div>
+    <div id="load-more-wrap" style="text-align:center; margin: 24px 0;">
+        <button id="load-more">Load more articles</button>
+    </div>
+    {% endif %}
+
     {% else %}
     <div class="empty">
         <p>No articles yet.</p>
@@ -222,11 +275,22 @@
         const input = document.getElementById('search');
         const countEl = document.getElementById('article-count');
         const noResults = document.getElementById('no-results');
-        const total = {{ total }};
+        const olderDiv = document.getElementById('older-articles');
+        const loadMoreWrap = document.getElementById('load-more-wrap');
+        const loadMoreBtn = document.getElementById('load-more');
+        const totalRecent = {{ total_recent }};
+        const totalAll = {{ total_all }};
         let activeTag = null;
+        let moreLoaded = false;
 
         function applyFilter() {
             const q = input.value.trim().toLowerCase();
+            const filtering = activeTag || q;
+
+            // When filtering, reveal older articles so they can be searched
+            if (olderDiv) olderDiv.style.display = (filtering || moreLoaded) ? '' : 'none';
+            if (loadMoreWrap) loadMoreWrap.style.display = (filtering || moreLoaded) ? 'none' : '';
+
             const articles = document.querySelectorAll('.article');
             const headings = document.querySelectorAll('.month-heading');
             let visible = 0;
@@ -254,15 +318,24 @@
                 heading.style.display = hasVisible ? '' : 'none';
             });
 
-            const filtering = activeTag || q;
-            countEl.textContent = filtering
-                ? visible + ' article' + (visible !== 1 ? 's' : '') + ' found'
-                : total + ' article' + (total !== 1 ? 's' : '') + ' tracked';
+            if (filtering) {
+                countEl.textContent = visible + ' article' + (visible !== 1 ? 's' : '') + ' found';
+            } else if (moreLoaded) {
+                countEl.textContent = totalAll + ' article' + (totalAll !== 1 ? 's' : '') + ' tracked in the last 12 months';
+            } else {
+                countEl.textContent = totalRecent + ' article' + (totalRecent !== 1 ? 's' : '') + ' tracked in the last 6 months';
+            }
             noResults.style.display = (filtering && visible === 0) ? 'block' : 'none';
         }
 
+        if (loadMoreBtn) {
+            loadMoreBtn.addEventListener('click', function () {
+                moreLoaded = true;
+                applyFilter();
+            });
+        }
+
         input.addEventListener('input', function () {
-            // Typing clears any active tag filter
             activeTag = null;
             document.querySelectorAll('.search-term.active').forEach(function (el) {
                 el.classList.remove('active');
@@ -274,7 +347,6 @@
             tag.addEventListener('click', function () {
                 const term = this.closest('.article').dataset.term;
                 if (activeTag === term) {
-                    // Clicking the active tag again clears the filter
                     activeTag = null;
                     this.classList.remove('active');
                     input.value = '';
