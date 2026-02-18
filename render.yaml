@@ -22,7 +22,7 @@ services:
   - type: cron
     name: earth-law-fetcher
     runtime: python
-    schedule: "0 8 * * *"
+    schedule: "0 12,22 * * *"
     buildCommand: pip install -r requirements.txt
     startCommand: python fetch_articles.py
     envVars:
