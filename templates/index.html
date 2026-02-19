@@ -10,7 +10,7 @@
             font-family: Georgia, 'Times New Roman', serif;
             background: #f5f0e8;
             color: #2c2c2c;
-            max-width: 800px;
+            max-width: 1100px;
             margin: 0 auto;
             padding: 20px;
         }
@@ -20,110 +20,8 @@
             border-bottom: 2px solid #3a6b35;
             margin-bottom: 0;
         }
-        header h1 {
-            color: #3a6b35;
-            font-size: 2em;
-            margin-bottom: 5px;
-        }
-        header p {
-            color: #666;
-            font-style: italic;
-        }
-        .article-count {
-            text-align: center;
-            color: #888;
-            margin-bottom: 20px;
-            font-size: 0.9em;
-        }
-        .article {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            transition: box-shadow 0.2s;
-        }
-        .article:hover {
-            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-        }
-        .article-title a {
-            color: #2c2c2c;
-            text-decoration: none;
-            font-size: 1.15em;
-            font-weight: bold;
-            line-height: 1.4;
-        }
-        .article-title a:hover {
-            color: #3a6b35;
-        }
-        .original-title {
-            color: #888;
-            font-size: 0.9em;
-            font-style: italic;
-            margin-top: 4px;
-        }
-        .article-meta {
-            margin-top: 8px;
-            font-size: 0.85em;
-            color: #666;
-        }
-        .outlet {
-            font-weight: bold;
-            color: #555;
-        }
-        .language-badge {
-            display: inline-block;
-            background: #3a6b35;
-            color: white;
-            padding: 1px 8px;
-            border-radius: 10px;
-            font-size: 0.75em;
-            margin-left: 8px;
-            vertical-align: middle;
-        }
-        .translate-link {
-            color: #3a6b35;
-            font-size: 0.85em;
-            margin-left: 10px;
-        }
-        .search-term {
-            display: inline-block;
-            background: #e8f0e5;
-            color: #3a6b35;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.75em;
-            margin-top: 5px;
-            cursor: pointer;
-        }
-        .search-term:hover {
-            background: #3a6b35;
-            color: white;
-        }
-        .search-term.active {
-            background: #3a6b35;
-            color: white;
-        }
-        .empty {
-            text-align: center;
-            padding: 60px 20px;
-            color: #888;
-        }
-        .empty p { margin-bottom: 10px; }
-        .empty code {
-            background: #e0e0e0;
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.9em;
-        }
-        .month-heading {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #3a6b35;
-            margin: 30px 0 12px;
-            padding-bottom: 6px;
-            border-bottom: 1px solid #c8dcc4;
-        }
+        header h1 { color: #3a6b35; font-size: 2em; margin-bottom: 5px; }
+        header p { color: #666; font-style: italic; }
         .keynote {
             text-align: center;
             color: #000;
@@ -131,15 +29,20 @@
             font-weight: bold;
             font-size: 1.2em;
             padding: 22px 0;
-            margin-bottom: 0;
         }
         .divider {
             border: none;
             border-top: 2px solid #3a6b35;
-            margin: 0 0 24px;
+            margin: 0 0 20px;
+        }
+        .top-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 12px;
         }
         .search-bar {
-            margin-bottom: 20px;
+            flex: 1;
         }
         .search-bar input {
             width: 100%;
@@ -152,28 +55,159 @@
             color: #2c2c2c;
             outline: none;
         }
-        .search-bar input:focus {
-            border-color: #3a6b35;
+        .search-bar input:focus { border-color: #3a6b35; }
+        .all-articles-btn {
+            display: inline-block;
+            padding: 10px 18px;
+            background: #3a6b35;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.95em;
+            white-space: nowrap;
         }
-        #no-results {
-            display: none;
-            text-align: center;
-            padding: 40px 20px;
+        .all-articles-btn:hover { background: #2d5429; }
+        .article-count {
             color: #888;
+            font-size: 0.9em;
+            margin-bottom: 16px;
         }
-        #load-more {
+        /* Search results */
+        #search-results { display: none; margin-top: 4px; }
+        #search-clear {
+            display: none;
+            margin-bottom: 12px;
+            font-size: 0.9em;
+            color: #888;
+            cursor: pointer;
+            background: none;
+            border: none;
+            font-family: Georgia, 'Times New Roman', serif;
+            padding: 0;
+        }
+        #search-clear:hover { color: #3a6b35; }
+        .search-result-item {
+            background: white;
+            border-radius: 8px;
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .search-result-item a.result-title {
+            color: #2c2c2c;
+            text-decoration: none;
+            font-size: 1.05em;
+            font-weight: bold;
+            line-height: 1.4;
+            display: block;
+        }
+        .search-result-item a.result-title:hover { color: #3a6b35; }
+        .result-meta { font-size: 0.85em; color: #666; margin-top: 5px; }
+        /* Tag grid */
+        .tile-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        @media (max-width: 999px) { .tile-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 599px) { .tile-grid { grid-template-columns: 1fr; } }
+        .tile {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            transition: box-shadow 0.2s;
+        }
+        .tile:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .tile-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #c8dcc4;
+        }
+        .tile-title { font-size: 1.05em; font-weight: bold; color: #3a6b35; }
+        .tile-count { color: #888; font-size: 0.85em; margin-left: 4px; }
+        .tile-viewall {
+            font-size: 0.8em;
+            color: #888;
+            text-decoration: none;
+            white-space: nowrap;
+            margin-left: 8px;
+            flex-shrink: 0;
+        }
+        .tile-viewall:hover { color: #3a6b35; text-decoration: underline; }
+        .tile-articles {
+            list-style: none;
+            flex: 1;
+        }
+        .tile-articles.scrollable {
+            overflow-y: auto;
+            max-height: 500px;
+        }
+        .tile-article {
+            padding: 8px 0;
+            border-bottom: 1px solid #f0ebe0;
+        }
+        .tile-article:last-child { border-bottom: none; }
+        .tile-article a {
+            color: #2c2c2c;
+            text-decoration: none;
+            font-size: 0.92em;
+            line-height: 1.4;
+            display: block;
+        }
+        .tile-article a:hover { color: #3a6b35; }
+        .tile-article-meta { font-size: 0.78em; color: #888; margin-top: 2px; }
+        .tile-load-more {
             background: white;
             color: #3a6b35;
             border: 2px solid #3a6b35;
-            padding: 10px 28px;
-            font-size: 1em;
+            padding: 6px 16px;
+            font-size: 0.85em;
             font-family: Georgia, 'Times New Roman', serif;
             border-radius: 6px;
             cursor: pointer;
+            margin-top: 10px;
+            align-self: center;
         }
-        #load-more:hover {
+        .tile-load-more:hover { background: #3a6b35; color: white; }
+        .tile-empty { color: #aaa; font-style: italic; font-size: 0.9em; padding: 12px 0; }
+        /* Shared */
+        .language-badge {
+            display: inline-block;
             background: #3a6b35;
             color: white;
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            margin-left: 4px;
+            vertical-align: middle;
+        }
+        .search-term {
+            display: inline-block;
+            background: #e8f0e5;
+            color: #3a6b35;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            text-decoration: none;
+        }
+        .search-term:hover { background: #3a6b35; color: white; }
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #888;
+        }
+        .empty p { margin-bottom: 10px; }
+        .empty code {
+            background: #e0e0e0;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 0.9em;
         }
     </style>
 </head>
@@ -186,83 +220,61 @@
     <p class="keynote">A global repository of Earth law news, updated twice-daily.</p>
     <hr class="divider">
 
-    {% if recent_groups or older_groups %}
-    <div class="search-bar">
-        <input type="search" id="search" placeholder="Search articles…" autocomplete="off">
-    </div>
-    <div class="article-count" id="article-count">{{ total_recent }} article{{ 's' if total_recent != 1 }} tracked in the last 6 months</div>
-    <div id="no-results">No articles match your search.</div>
-
-    {% for month_label, articles in recent_groups %}
-    <div class="month-heading">{{ month_label }}</div>
-    {% for article in articles %}
-    <div class="article" data-term="{{ article.search_term }}">
-        <div class="article-title">
-            {% if article.language != 'en' %}
-                <a href="{{ article.real_url or article.url }}" target="_blank" rel="noopener">{{ article.title_en }}</a>
-                <span class="language-badge">{{ article.language }}</span>
-                <a href="/read/{{ article.id }}" class="translate-link">Read translated</a>
-                <div class="original-title">{{ article.title }}</div>
-            {% else %}
-                <a href="{{ article.real_url or article.url }}" target="_blank" rel="noopener">{{ article.title }}</a>
-            {% endif %}
+    {% if tiles %}
+    <div class="top-bar">
+        <div class="search-bar">
+            <input type="search" id="search" placeholder="Search all articles…" autocomplete="off">
         </div>
-        <div class="article-meta">
-            {% if article.language != 'en' and article.outlet_en and article.outlet_en != article.outlet %}
-                <span class="outlet">{{ article.outlet_en }}</span> ({{ article.outlet }})
-            {% else %}
-                <span class="outlet">{{ article.outlet }}</span>
-            {% endif %}
-            {% if article.author %}
-                &middot; <span class="author">{{ article.author }}</span>
-            {% endif %}
-            {% if article.date %}
-                &middot; {{ article.date }}
-            {% endif %}
-        </div>
-        <span class="search-term">{{ article.search_term }}</span>
+        <a href="/all" class="all-articles-btn">All articles</a>
     </div>
-    {% endfor %}
-    {% endfor %}
+    <button id="search-clear">&larr; Back to topics</button>
+    <div class="article-count" id="article-count">
+        {{ tiles | sum(attribute='count') }} articles across {{ tiles | length }} topics
+    </div>
 
-    {% if older_groups %}
-    <div id="older-articles" style="display:none">
-        {% for month_label, articles in older_groups %}
-        <div class="month-heading">{{ month_label }}</div>
-        {% for article in articles %}
-        <div class="article" data-term="{{ article.search_term }}">
-            <div class="article-title">
-                {% if article.language != 'en' %}
-                    <a href="{{ article.real_url or article.url }}" target="_blank" rel="noopener">{{ article.title_en }}</a>
-                    <span class="language-badge">{{ article.language }}</span>
-                    <a href="/read/{{ article.id }}" class="translate-link">Read translated</a>
-                    <div class="original-title">{{ article.title }}</div>
-                {% else %}
-                    <a href="{{ article.real_url or article.url }}" target="_blank" rel="noopener">{{ article.title }}</a>
-                {% endif %}
+    <div id="search-results"></div>
+
+    <div class="tile-grid" id="tile-grid">
+        {% for tile in tiles %}
+        <div class="tile">
+            <div class="tile-header">
+                <div>
+                    <span class="tile-title">{{ tile.name }}</span>
+                    <span class="tile-count">({{ tile.count }})</span>
+                </div>
+                <a href="/tag/{{ tile.slug }}" class="tile-viewall">View all &rarr;</a>
             </div>
-            <div class="article-meta">
-                {% if article.language != 'en' and article.outlet_en and article.outlet_en != article.outlet %}
-                    <span class="outlet">{{ article.outlet_en }}</span> ({{ article.outlet }})
-                {% else %}
-                    <span class="outlet">{{ article.outlet }}</span>
-                {% endif %}
-                {% if article.author %}
-                    &middot; <span class="author">{{ article.author }}</span>
-                {% endif %}
-                {% if article.date %}
-                    &middot; {{ article.date }}
-                {% endif %}
-            </div>
-            <span class="search-term">{{ article.search_term }}</span>
+            {% if tile.articles %}
+            <ul class="tile-articles{% if tile.count > 12 %} scrollable{% endif %}"
+                data-slug="{{ tile.slug }}"
+                data-loaded="4"
+                data-total="{{ tile.count }}">
+                {% for article in tile.articles[:4] %}
+                <li class="tile-article">
+                    <a href="{{ article.real_url or article.url }}" target="_blank" rel="noopener">
+                        {{ article.title_en or article.title }}
+                    </a>
+                    <div class="tile-article-meta">
+                        {{ article.outlet_en or article.outlet }}
+                        &middot; {{ article.date | format_date }}
+                        {% if article.language != 'en' %}
+                        <span class="language-badge">{{ article.language }}</span>
+                        {% endif %}
+                    </div>
+                </li>
+                {% endfor %}
+            </ul>
+            {% if tile.count > 4 %}
+            <button class="tile-load-more" data-slug="{{ tile.slug }}">
+                Load more ({{ tile.count - 4 }} more)
+            </button>
+            {% endif %}
+            {% else %}
+            <p class="tile-empty">No articles yet for this topic.</p>
+            {% endif %}
         </div>
         {% endfor %}
-        {% endfor %}
     </div>
-    <div id="load-more-wrap" style="text-align:center; margin: 24px 0;">
-        <button id="load-more">Load more articles</button>
-    </div>
-    {% endif %}
 
     {% else %}
     <div class="empty">
@@ -272,95 +284,120 @@
     {% endif %}
 
     <script>
-        const input = document.getElementById('search');
-        const countEl = document.getElementById('article-count');
-        const noResults = document.getElementById('no-results');
-        const olderDiv = document.getElementById('older-articles');
-        const loadMoreWrap = document.getElementById('load-more-wrap');
-        const loadMoreBtn = document.getElementById('load-more');
-        const totalRecent = {{ total_recent }};
-        const totalAll = {{ total_all }};
-        let activeTag = null;
-        let moreLoaded = false;
+        const SEARCH_DATA = {{ search_data | safe }};
+        const TILE_DATA = {{ tile_data | safe }};
+    </script>
+    <script>
+        (function () {
+            var searchInput = document.getElementById('search');
+            var searchResults = document.getElementById('search-results');
+            var tileGrid = document.getElementById('tile-grid');
+            var articleCount = document.getElementById('article-count');
+            var searchClear = document.getElementById('search-clear');
+            var totalArticles = SEARCH_DATA.length;
+            var totalTopics = document.querySelectorAll('.tile').length;
 
-        function applyFilter() {
-            const q = input.value.trim().toLowerCase();
-            const filtering = activeTag || q;
-
-            // When filtering, reveal older articles so they can be searched
-            if (olderDiv) olderDiv.style.display = (filtering || moreLoaded) ? '' : 'none';
-            if (loadMoreWrap) loadMoreWrap.style.display = (filtering || moreLoaded) ? 'none' : '';
-
-            const articles = document.querySelectorAll('.article');
-            const headings = document.querySelectorAll('.month-heading');
-            let visible = 0;
-
-            articles.forEach(function (el) {
-                let show;
-                if (activeTag) {
-                    show = el.dataset.term === activeTag;
-                } else {
-                    show = !q || el.textContent.toLowerCase().includes(q);
-                }
-                el.style.display = show ? '' : 'none';
-                if (show) visible++;
-            });
-
-            headings.forEach(function (heading) {
-                let next = heading.nextElementSibling;
-                let hasVisible = false;
-                while (next && !next.classList.contains('month-heading')) {
-                    if (next.classList.contains('article') && next.style.display !== 'none') {
-                        hasVisible = true;
-                    }
-                    next = next.nextElementSibling;
-                }
-                heading.style.display = hasVisible ? '' : 'none';
-            });
-
-            if (filtering) {
-                countEl.textContent = visible + ' article' + (visible !== 1 ? 's' : '') + ' found';
-            } else if (moreLoaded) {
-                countEl.textContent = totalAll + ' article' + (totalAll !== 1 ? 's' : '') + ' tracked in the last 12 months';
-            } else {
-                countEl.textContent = totalRecent + ' article' + (totalRecent !== 1 ? 's' : '') + ' tracked in the last 6 months';
+            function escapeHtml(str) {
+                return String(str || '')
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;');
             }
-            noResults.style.display = (filtering && visible === 0) ? 'block' : 'none';
-        }
 
-        if (loadMoreBtn) {
-            loadMoreBtn.addEventListener('click', function () {
-                moreLoaded = true;
-                applyFilter();
-            });
-        }
+            function formatDate(dateStr) {
+                try {
+                    var d = new Date(dateStr);
+                    return d.toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' });
+                } catch (e) { return dateStr; }
+            }
 
-        input.addEventListener('input', function () {
-            activeTag = null;
-            document.querySelectorAll('.search-term.active').forEach(function (el) {
-                el.classList.remove('active');
-            });
-            applyFilter();
-        });
+            function clearSearch() {
+                searchInput.value = '';
+                tileGrid.style.display = '';
+                searchResults.style.display = 'none';
+                searchResults.innerHTML = '';
+                searchClear.style.display = 'none';
+                articleCount.textContent = totalArticles + ' articles across ' + totalTopics + ' topics';
+            }
 
-        document.querySelectorAll('.search-term').forEach(function (tag) {
-            tag.addEventListener('click', function () {
-                const term = this.closest('.article').dataset.term;
-                if (activeTag === term) {
-                    activeTag = null;
-                    this.classList.remove('active');
-                    input.value = '';
-                } else {
-                    activeTag = term;
-                    document.querySelectorAll('.search-term.active').forEach(function (el) {
-                        el.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                    input.value = '';
+            function applySearch() {
+                var q = searchInput.value.trim().toLowerCase();
+                if (!q) { clearSearch(); return; }
+
+                var filtered = SEARCH_DATA.filter(function (a) {
+                    return (a.title || '').toLowerCase().indexOf(q) !== -1 ||
+                           (a.outlet || '').toLowerCase().indexOf(q) !== -1 ||
+                           (a.tag_name || '').toLowerCase().indexOf(q) !== -1;
+                });
+
+                tileGrid.style.display = 'none';
+                searchResults.style.display = 'block';
+                searchClear.style.display = 'inline';
+                articleCount.textContent = filtered.length + ' article' +
+                    (filtered.length !== 1 ? 's' : '') + ' matching \u201c' +
+                    escapeHtml(searchInput.value.trim()) + '\u201d';
+
+                if (filtered.length === 0) {
+                    searchResults.innerHTML = '<p style="text-align:center;color:#888;padding:40px 0">No articles match your search.</p>';
+                    return;
                 }
-                applyFilter();
+
+                var html = filtered.map(function (a) {
+                    var lang = a.language !== 'en'
+                        ? ' <span class="language-badge">' + escapeHtml(a.language) + '</span>' : '';
+                    return '<div class="search-result-item">' +
+                        '<a class="result-title" href="' + escapeHtml(a.url) +
+                        '" target="_blank" rel="noopener">' + escapeHtml(a.title) + '</a>' +
+                        '<div class="result-meta">' +
+                        escapeHtml(a.outlet) + ' &middot; ' + formatDate(a.date) +
+                        ' <a href="/tag/' + escapeHtml(a.tag_slug) +
+                        '" class="search-term">' + escapeHtml(a.tag_name) + '</a>' +
+                        lang + '</div></div>';
+                }).join('');
+                searchResults.innerHTML = html;
+            }
+
+            searchInput.addEventListener('input', applySearch);
+            searchClear.addEventListener('click', clearSearch);
+
+            // Load more per tile
+            document.querySelectorAll('.tile-load-more').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var slug = btn.dataset.slug;
+                    var list = document.querySelector('.tile-articles[data-slug="' + slug + '"]');
+                    var loaded = parseInt(list.dataset.loaded, 10);
+                    var total = parseInt(list.dataset.total, 10);
+                    var tagData = TILE_DATA[slug];
+                    if (!tagData) return;
+
+                    var nextBatch = tagData.articles.slice(loaded, loaded + 4);
+                    var html = nextBatch.map(function (a) {
+                        var lang = a.language !== 'en'
+                            ? ' <span class="language-badge">' + escapeHtml(a.language) + '</span>' : '';
+                        return '<li class="tile-article">' +
+                            '<a href="' + escapeHtml(a.url) +
+                            '" target="_blank" rel="noopener">' + escapeHtml(a.title) + '</a>' +
+                            '<div class="tile-article-meta">' +
+                            escapeHtml(a.outlet) + ' &middot; ' + formatDate(a.date) +
+                            lang + '</div></li>';
+                    }).join('');
+                    list.insertAdjacentHTML('beforeend', html);
+
+                    var newLoaded = loaded + nextBatch.length;
+                    list.dataset.loaded = newLoaded;
+
+                    if (newLoaded >= total) {
+                        btn.style.display = 'none';
+                    } else {
+                        btn.textContent = 'Load more (' + (total - newLoaded) + ' more)';
+                    }
+                    if (newLoaded > 12 && !list.classList.contains('scrollable')) {
+                        list.classList.add('scrollable');
+                    }
+                });
             });
-        });
+        }());
     </script>
 </body>
 </html>

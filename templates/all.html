@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Articles — Earth Law Article Tracker</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: Georgia, 'Times New Roman', serif;
+            background: #f5f0e8;
+            color: #2c2c2c;
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 30px 0 20px;
+            border-bottom: 2px solid #3a6b35;
+            margin-bottom: 24px;
+        }
+        header h1 { color: #3a6b35; font-size: 2em; margin-bottom: 5px; }
+        header p { color: #666; font-style: italic; }
+        .back-link {
+            display: inline-block;
+            color: #3a6b35;
+            text-decoration: none;
+            font-size: 0.9em;
+            margin-bottom: 16px;
+        }
+        .back-link:hover { text-decoration: underline; }
+        h2 { color: #3a6b35; margin-bottom: 8px; font-size: 1.5em; }
+        .article-count { color: #888; font-size: 0.9em; margin-bottom: 16px; }
+        .search-form {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+        .search-form input {
+            flex: 1;
+            padding: 10px 16px;
+            font-size: 1em;
+            font-family: Georgia, 'Times New Roman', serif;
+            border: 2px solid #c8dcc4;
+            border-radius: 6px;
+            background: white;
+            color: #2c2c2c;
+            outline: none;
+        }
+        .search-form input:focus { border-color: #3a6b35; }
+        .search-form button {
+            padding: 10px 20px;
+            background: #3a6b35;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: Georgia, 'Times New Roman', serif;
+            font-size: 1em;
+        }
+        .search-form button:hover { background: #2d5429; }
+        .clear-link {
+            color: #888;
+            font-size: 0.9em;
+            text-decoration: none;
+            white-space: nowrap;
+        }
+        .clear-link:hover { color: #3a6b35; }
+        .article {
+            background: white;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            transition: box-shadow 0.2s;
+        }
+        .article:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.15); }
+        .article-title a {
+            color: #2c2c2c;
+            text-decoration: none;
+            font-size: 1.05em;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+        .article-title a:hover { color: #3a6b35; }
+        .article-meta { margin-top: 6px; font-size: 0.85em; color: #666; }
+        .outlet { font-weight: bold; color: #555; }
+        .language-badge {
+            display: inline-block;
+            background: #3a6b35;
+            color: white;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 0.75em;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .translate-link { color: #3a6b35; font-size: 0.85em; margin-left: 8px; }
+        .search-term {
+            display: inline-block;
+            background: #e8f0e5;
+            color: #3a6b35;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.75em;
+            margin-top: 6px;
+            text-decoration: none;
+        }
+        .search-term:hover { background: #3a6b35; color: white; }
+        .empty { text-align: center; padding: 60px 20px; color: #888; }
+        .empty p { margin-bottom: 10px; }
+        .pagination {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            margin: 28px 0;
+            flex-wrap: wrap;
+        }
+        .pagination a, .pagination span {
+            display: inline-block;
+            padding: 7px 13px;
+            border: 1px solid #c8dcc4;
+            border-radius: 4px;
+            color: #3a6b35;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .pagination .current {
+            background: #3a6b35;
+            color: white;
+            border-color: #3a6b35;
+        }
+        .pagination a:hover { background: #e8f0e5; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Earth Law Article Tracker</h1>
+        <p>Rights of Nature &middot; Ecocide &middot; Human Environmental Rights</p>
+    </header>
+
+    <a href="/" class="back-link">&larr; Back to topics</a>
+
+    <h2>All Articles</h2>
+
+    <form class="search-form" method="get" action="/all">
+        <input type="search" name="q" value="{{ q | e }}" placeholder="Search articles…" autocomplete="off">
+        <button type="submit">Search</button>
+        {% if q %}<a href="/all" class="clear-link">Clear</a>{% endif %}
+    </form>
+
+    <div class="article-count">
+        {% if q %}
+            {{ total }} article{{ 's' if total != 1 }} matching &ldquo;{{ q | e }}&rdquo;
+            {% if total_pages > 1 %}&mdash; page {{ page }} of {{ total_pages }}{% endif %}
+        {% else %}
+            {{ total }} article{{ 's' if total != 1 }} total
+            {% if total_pages > 1 %}&mdash; page {{ page }} of {{ total_pages }}{% endif %}
+        {% endif %}
+    </div>
+
+    {% if articles %}
+    {% for article in articles %}
+    <div class="article">
+        <div class="article-title">
+            <a href="{{ article.real_url or article.url }}" target="_blank" rel="noopener">
+                {{ article.title_en or article.title }}
+            </a>
+            {% if article.language != 'en' %}
+            <span class="language-badge">{{ article.language }}</span>
+            <a href="/read/{{ article.id }}" class="translate-link">Read translated</a>
+            {% endif %}
+        </div>
+        <div class="article-meta">
+            <span class="outlet">{{ article.outlet_en or article.outlet }}</span>
+            &middot; {{ article.date | format_date }}
+        </div>
+        <a href="/tag/{{ article._tag_slug }}" class="search-term">{{ article._tag_name }}</a>
+    </div>
+    {% endfor %}
+
+    {% if total_pages > 1 %}
+    <nav class="pagination">
+        {% if page > 1 %}
+        <a href="/all?page={{ page - 1 }}{% if q %}&q={{ q | urlencode }}{% endif %}">&laquo; Prev</a>
+        {% endif %}
+        {% for p in range(1, total_pages + 1) %}
+            {% if p == page %}
+            <span class="current">{{ p }}</span>
+            {% else %}
+            <a href="/all?page={{ p }}{% if q %}&q={{ q | urlencode }}{% endif %}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+        {% if page < total_pages %}
+        <a href="/all?page={{ page + 1 }}{% if q %}&q={{ q | urlencode }}{% endif %}">Next &raquo;</a>
+        {% endif %}
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="empty">
+        <p>No articles found{% if q %} matching &ldquo;{{ q | e }}&rdquo;{% endif %}.</p>
+    </div>
+    {% endif %}
+</body>
+</html>

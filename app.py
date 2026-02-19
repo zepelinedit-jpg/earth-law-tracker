@@ -1,17 +1,42 @@
 #!/usr/bin/env python3
 """Flask web app to browse Earth law articles."""
 
+import json
 import os
+import re
+from collections import defaultdict
 from datetime import datetime, timedelta
 from email.utils import parsedate_to_datetime
 
-from flask import Flask, render_template, abort
+from flask import Flask, render_template, abort, request
 from newspaper import Article as NewsArticle
 from deep_translator import GoogleTranslator
 
 from db import load_articles, save_articles, init_db
 
 app = Flask(__name__)
+
+SEARCH_TERMS = [
+    '"Rights of Nature"',
+    '"rights of future generations"',
+    '"ecocide"',
+    '"Earth law"',
+    '"environmental personhood"',
+    '"rights of rivers"',
+    '"river rights"',
+    '"Indigenous environmental rights"',
+    '"bioregionalism"',
+]
+
+
+def format_date(date_str):
+    try:
+        return parsedate_to_datetime(date_str).strftime("%b %d, %Y")
+    except Exception:
+        return date_str
+
+
+app.jinja_env.filters["format_date"] = format_date
 
 
 def parse_date(date_str):
@@ -43,42 +68,152 @@ def fetch_and_parse_article(url):
     return news.text, news.authors
 
 
-def parse_fetched_date(fetched_str):
-    try:
-        return datetime.fromisoformat(fetched_str)
-    except Exception:
-        return datetime.min
+def tag_display_name(search_term):
+    name = search_term.strip('"').strip("'")
+    return name[0].upper() + name[1:] if name else name
+
+
+def tag_slug(search_term):
+    name = tag_display_name(search_term).lower()
+    slug = re.sub(r"[^\w\s-]", "", name)
+    return re.sub(r"[\s_]+", "-", slug).strip("-")
+
+
+def build_tag_tiles(articles):
+    by_tag = defaultdict(list)
+    for a in articles:
+        by_tag[a["search_term"]].append(a)
+    tiles = []
+    for term, arts in by_tag.items():
+        arts_sorted = sorted(arts, key=lambda a: parse_date(a.get("date", "")), reverse=True)
+        tiles.append({
+            "search_term": term,
+            "name": tag_display_name(term),
+            "slug": tag_slug(term),
+            "count": len(arts_sorted),
+            "articles": arts_sorted,
+        })
+    tiles.sort(key=lambda t: parse_date(t["articles"][0].get("date", "")), reverse=True)
+    return tiles
+
+
+def _safe_json(obj):
+    """Serialize to JSON and escape </script> sequences for safe embedding in HTML."""
+    return json.dumps(obj, ensure_ascii=False).replace("</", r"<\/")
 
 
 @app.route("/")
 def index():
     articles = load_articles()
-    tz = parse_date(articles[0]["date"]).tzinfo if articles else None
-    now = datetime.now(tz=tz)
-    cutoff_12m = now - timedelta(days=365)
-    cutoff_6m  = now - timedelta(days=182)
+    tiles = build_tag_tiles(articles)
 
-    articles = [a for a in articles if parse_date(a.get("date", "")) > cutoff_12m]
+    search_data = _safe_json([
+        {
+            "title": a.get("title_en") or a.get("title"),
+            "outlet": a.get("outlet_en") or a.get("outlet"),
+            "date": a.get("date", ""),
+            "tag_name": tag_display_name(a.get("search_term", "")),
+            "tag_slug": tag_slug(a.get("search_term", "")),
+            "url": a.get("real_url") or a.get("url"),
+            "language": a.get("language", "en"),
+            "article_id": a.get("id"),
+        }
+        for a in articles
+    ])
+
+    tile_data = _safe_json({
+        t["slug"]: {
+            "name": t["name"],
+            "articles": [
+                {
+                    "title": a.get("title_en") or a.get("title"),
+                    "outlet": a.get("outlet_en") or a.get("outlet"),
+                    "date": a.get("date", ""),
+                    "url": a.get("real_url") or a.get("url"),
+                    "language": a.get("language", "en"),
+                    "article_id": a.get("id"),
+                }
+                for a in t["articles"]
+            ],
+        }
+        for t in tiles
+    })
+
+    return render_template("index.html", tiles=tiles, search_data=search_data, tile_data=tile_data)
+
+
+@app.route("/all")
+def all_articles():
+    articles = load_articles()
+    q = request.args.get("q", "").strip()
+    try:
+        page = max(1, int(request.args.get("page", 1)))
+    except (ValueError, TypeError):
+        page = 1
+    per_page = 50
+
     articles.sort(key=lambda a: parse_date(a.get("date", "")), reverse=True)
 
-    def make_groups(arts):
-        groups = {}
-        for a in arts:
-            pd = parse_date(a.get("date", ""))
-            label = pd.strftime("%B %Y") if pd != datetime.min else "Unknown"
-            groups.setdefault(label, []).append(a)
-        return list(groups.items())
+    if q:
+        q_lower = q.lower()
+        articles = [
+            a for a in articles
+            if q_lower in (a.get("title_en") or a.get("title") or "").lower()
+            or q_lower in (a.get("outlet_en") or a.get("outlet") or "").lower()
+            or q_lower in tag_display_name(a.get("search_term", "")).lower()
+        ]
 
-    recent  = [a for a in articles if parse_date(a.get("date", "")) > cutoff_6m]
-    older   = [a for a in articles if parse_date(a.get("date", "")) <= cutoff_6m]
+    total = len(articles)
+    total_pages = max(1, -(-total // per_page))
+    page = min(page, total_pages)
+    start = (page - 1) * per_page
+    # Note: dicts are fresh from load_articles() each request, safe to mutate
+    page_articles = articles[start:start + per_page]
+    for a in page_articles:
+        a["_tag_name"] = tag_display_name(a.get("search_term", ""))
+        a["_tag_slug"] = tag_slug(a.get("search_term", ""))
 
-    return render_template(
-        "index.html",
-        recent_groups=make_groups(recent),
-        older_groups=make_groups(older),
-        total_recent=len(recent),
-        total_all=len(articles),
-    )
+    return render_template("all.html", articles=page_articles, total=total,
+                           page=page, total_pages=total_pages, q=q)
+
+
+@app.route("/tag/<slug>")
+def tag_view(slug):
+    articles = load_articles()
+
+    matched_term = None
+    for a in articles:
+        if tag_slug(a.get("search_term", "")) == slug:
+            matched_term = a.get("search_term")
+            break
+
+    if matched_term is None:
+        for term in SEARCH_TERMS:
+            if tag_slug(term) == slug:
+                matched_term = term
+                break
+
+    if matched_term is None:
+        abort(404)
+
+    tag_articles = [a for a in articles if a.get("search_term") == matched_term]
+    tag_articles.sort(key=lambda a: parse_date(a.get("date", "")), reverse=True)
+
+    try:
+        page = max(1, int(request.args.get("page", 1)))
+    except (ValueError, TypeError):
+        page = 1
+    per_page = 50
+    total = len(tag_articles)
+    total_pages = max(1, -(-total // per_page))
+    page = min(page, total_pages)
+    start = (page - 1) * per_page
+    page_articles = tag_articles[start:start + per_page]
+
+    return render_template("tag.html", articles=page_articles,
+                           tag_name=tag_display_name(matched_term),
+                           tag_slug=slug, total=total,
+                           page=page, total_pages=total_pages)
 
 
 @app.route("/read/<article_id>")
