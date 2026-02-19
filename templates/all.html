@@ -15,12 +15,16 @@
             padding: 20px;
         }
         header {
-            text-align: center;
-            padding: 30px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            padding: 20px 0;
             border-bottom: 2px solid #3a6b35;
             margin-bottom: 24px;
         }
-        header img { max-height: 80px; margin-bottom: 10px; }
+        header a.logo-link { flex-shrink: 0; }
+        header img { max-height: 140px; display: block; }
+        .header-text { flex: 1; text-align: center; }
         header h1 { color: #3a6b35; font-size: 2em; margin-bottom: 5px; }
         header p { color: #666; font-style: italic; }
         .back-link {
@@ -138,9 +142,11 @@
 </head>
 <body>
     <header>
-        <img src="/static/logo.png" alt="Earth Law Article Tracker logo">
-        <h1>Earth Law Article Tracker</h1>
-        <p>Rights of Nature &middot; Ecocide &middot; Human Environmental Rights</p>
+        <a href="/" class="logo-link"><img src="/static/logo.png" alt="Earth Law Article Tracker logo"></a>
+        <div class="header-text">
+            <h1>Earth Law Article Tracker</h1>
+            <p>Rights of Nature &middot; Ecocide &middot; Human Environmental Rights</p>
+        </div>
     </header>
 
     <a href="/" class="back-link">&larr; Back to topics</a>

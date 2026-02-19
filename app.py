@@ -77,6 +77,7 @@ TAG_CONSOLIDATION = {
     '"rights of rivers"':              '"river rights"',
     '"environmental personhood"':      '"Rights of Nature"',
     '"Earth law"':                     '"Rights of Nature"',
+    '"Indigenous land rights"':         '"Indigenous environmental rights"',
     '"free prior informed consent"':   '"Indigenous environmental rights"',
     '"Indigenous environmental justice"': '"Indigenous environmental rights"',
 }
