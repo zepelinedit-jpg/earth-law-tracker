@@ -124,6 +124,12 @@ def build_tag_tiles(articles):
     by_tag = defaultdict(list)
     for a in articles:
         by_tag[canonical_tag(a["search_term"])].append(a)
+
+    # Ensure every canonical term gets a tile, even if no articles yet
+    canonical_terms = set(SEARCH_TERMS) - set(TAG_CONSOLIDATION.keys())
+    for term in canonical_terms:
+        by_tag.setdefault(term, [])
+
     tiles = []
     for term, arts in by_tag.items():
         arts_sorted = sorted(arts, key=lambda a: parse_date(a.get("date", "")), reverse=True)
@@ -134,7 +140,9 @@ def build_tag_tiles(articles):
             "count": len(arts_sorted),
             "articles": arts_sorted,
         })
-    tiles.sort(key=lambda t: parse_date(t["articles"][0].get("date", "")), reverse=True)
+    # Tiles with articles sort by most-recent; empty tiles go to the end
+    _epoch = parse_date("Thu, 01 Jan 1970 00:00:00 +0000")
+    tiles.sort(key=lambda t: parse_date(t["articles"][0].get("date", "")) if t["articles"] else _epoch, reverse=True)
     return tiles
 
 
