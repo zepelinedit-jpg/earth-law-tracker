@@ -71,6 +71,22 @@ def fetch_and_parse_article(url):
     return news.text, news.authors
 
 
+# Maps non-canonical search terms to the canonical term they display under.
+# Search terms and DB records are unchanged; this only affects tile grouping.
+TAG_CONSOLIDATION = {
+    '"rights of rivers"':              '"river rights"',
+    '"environmental personhood"':      '"Rights of Nature"',
+    '"Earth law"':                     '"Rights of Nature"',
+    '"free prior informed consent"':   '"Indigenous environmental rights"',
+    '"Indigenous environmental justice"': '"Indigenous environmental rights"',
+}
+
+
+def canonical_tag(search_term):
+    """Return the canonical search term this term consolidates into."""
+    return TAG_CONSOLIDATION.get(search_term, search_term)
+
+
 def tag_display_name(search_term):
     name = search_term.strip('"').strip("'")
     return name[0].upper() + name[1:] if name else name
@@ -85,7 +101,7 @@ def tag_slug(search_term):
 def build_tag_tiles(articles):
     by_tag = defaultdict(list)
     for a in articles:
-        by_tag[a["search_term"]].append(a)
+        by_tag[canonical_tag(a["search_term"])].append(a)
     tiles = []
     for term, arts in by_tag.items():
         arts_sorted = sorted(arts, key=lambda a: parse_date(a.get("date", "")), reverse=True)
@@ -115,8 +131,8 @@ def index():
             "title": a.get("title_en") or a.get("title"),
             "outlet": a.get("outlet_en") or a.get("outlet"),
             "date": a.get("date", ""),
-            "tag_name": tag_display_name(a.get("search_term", "")),
-            "tag_slug": tag_slug(a.get("search_term", "")),
+            "tag_name": tag_display_name(canonical_tag(a.get("search_term", ""))),
+            "tag_slug": tag_slug(canonical_tag(a.get("search_term", ""))),
             "url": a.get("real_url") or a.get("url"),
             "language": a.get("language", "en"),
             "article_id": a.get("id"),
@@ -173,8 +189,8 @@ def all_articles():
     # Note: dicts are fresh from load_articles() each request, safe to mutate
     page_articles = articles[start:start + per_page]
     for a in page_articles:
-        a["_tag_name"] = tag_display_name(a.get("search_term", ""))
-        a["_tag_slug"] = tag_slug(a.get("search_term", ""))
+        a["_tag_name"] = tag_display_name(canonical_tag(a.get("search_term", "")))
+        a["_tag_slug"] = tag_slug(canonical_tag(a.get("search_term", "")))
 
     return render_template("all.html", articles=page_articles, total=total,
                            page=page, total_pages=total_pages, q=q)
@@ -184,22 +200,26 @@ def all_articles():
 def tag_view(slug):
     articles = load_articles()
 
+    # Only canonical tags have valid pages; resolve slug → canonical term
     matched_term = None
     for a in articles:
-        if tag_slug(a.get("search_term", "")) == slug:
-            matched_term = a.get("search_term")
+        ct = canonical_tag(a.get("search_term", ""))
+        if tag_slug(ct) == slug and ct == canonical_tag(ct):
+            matched_term = ct
             break
 
     if matched_term is None:
         for term in SEARCH_TERMS:
-            if tag_slug(term) == slug:
+            ct = canonical_tag(term)
+            if tag_slug(ct) == slug and ct == term:
                 matched_term = term
                 break
 
     if matched_term is None:
         abort(404)
 
-    tag_articles = [a for a in articles if a.get("search_term") == matched_term]
+    # Include articles from all terms that consolidate into this canonical term
+    tag_articles = [a for a in articles if canonical_tag(a.get("search_term", "")) == matched_term]
     tag_articles.sort(key=lambda a: parse_date(a.get("date", "")), reverse=True)
 
     try:
