@@ -18,16 +18,25 @@ app = Flask(__name__)
 
 SEARCH_TERMS = [
     '"Rights of Nature"',
-    '"rights of future generations"',
-    '"ecocide"',
-    '"Earth law"',
     '"environmental personhood"',
-    '"rights of rivers"',
+    '"ecosystem rights"',
+    '"ecological personhood"',
+    '"nonhuman rights legal"',
     '"river rights"',
+    '"rights of rivers"',
+    '"Earth law"',
+    '"Earth jurisprudence"',
+    '"legal guardianship of nature"',
+    '"environmental guardianship"',
     '"Indigenous environmental rights"',
     '"Indigenous land rights"',
     '"free prior informed consent"',
     '"Indigenous environmental justice"',
+    '"biocultural rights"',
+    '"ecocide"',
+    '"rights of future generations"',
+    '"right to a healthy environment"',
+    '"Green Amendments"',
     '"bioregionalism"',
 ]
 
@@ -74,12 +83,24 @@ def fetch_and_parse_article(url):
 # Maps non-canonical search terms to the canonical term they display under.
 # Search terms and DB records are unchanged; this only affects tile grouping.
 TAG_CONSOLIDATION = {
-    '"rights of rivers"':              '"river rights"',
-    '"environmental personhood"':      '"Rights of Nature"',
-    '"Earth law"':                     '"Rights of Nature"',
-    '"Indigenous land rights"':         '"Indigenous environmental rights"',
-    '"free prior informed consent"':   '"Indigenous environmental rights"',
+    # Rights of Nature tile
+    '"environmental personhood"':         '"Rights of Nature"',
+    '"ecosystem rights"':                 '"Rights of Nature"',
+    '"ecological personhood"':            '"Rights of Nature"',
+    '"nonhuman rights legal"':            '"Rights of Nature"',
+    # River rights tile
+    '"rights of rivers"':                 '"river rights"',
+    # Earth law tile
+    '"Earth jurisprudence"':              '"Earth law"',
+    '"legal guardianship of nature"':     '"Earth law"',
+    '"environmental guardianship"':       '"Earth law"',
+    # Indigenous environmental rights tile
+    '"Indigenous land rights"':           '"Indigenous environmental rights"',
+    '"free prior informed consent"':      '"Indigenous environmental rights"',
     '"Indigenous environmental justice"': '"Indigenous environmental rights"',
+    '"biocultural rights"':               '"Indigenous environmental rights"',
+    # Right to a healthy environment tile
+    '"Green Amendments"':                 '"right to a healthy environment"',
 }
 
 
