@@ -17,14 +17,19 @@
         header {
             display: flex;
             align-items: center;
-            gap: 24px;
             padding: 20px 0;
             border-bottom: 2px solid #3a6b35;
             margin-bottom: 0;
+            position: relative;
         }
-        header a.logo-link { flex-shrink: 0; }
+        header a.logo-link { flex-shrink: 0; position: relative; z-index: 1; }
         header img { max-height: 140px; display: block; }
-        .header-text { flex: 1; text-align: center; }
+        .header-text {
+            position: absolute;
+            left: 0; right: 0;
+            text-align: center;
+            pointer-events: none;
+        }
         header h1 { color: #3a6b35; font-size: 2em; margin-bottom: 5px; }
         header p { color: #666; font-style: italic; }
         .keynote {

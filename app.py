@@ -140,9 +140,8 @@ def build_tag_tiles(articles):
             "count": len(arts_sorted),
             "articles": arts_sorted,
         })
-    # Tiles with articles sort by most-recent; empty tiles go to the end
-    _epoch = parse_date("Thu, 01 Jan 1970 00:00:00 +0000")
-    tiles.sort(key=lambda t: parse_date(t["articles"][0].get("date", "")) if t["articles"] else _epoch, reverse=True)
+    # Sort by article count, most to fewest
+    tiles.sort(key=lambda t: t["count"], reverse=True)
     return tiles
 
 
