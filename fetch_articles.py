@@ -27,6 +27,9 @@ SEARCH_TERMS = [
     '"rights of rivers"',
     '"river rights"',
     '"Indigenous environmental rights"',
+    '"Indigenous land rights"',
+    '"free prior informed consent"',
+    '"Indigenous environmental justice"',
     '"bioregionalism"',
 ]
 
