@@ -17,27 +17,55 @@ from db import load_articles, save_articles, init_db
 app = Flask(__name__)
 
 SEARCH_TERMS = [
+    # Rights of Nature
     '"Rights of Nature"',
     '"environmental personhood"',
     '"ecosystem rights"',
     '"ecological personhood"',
     '"nonhuman rights legal"',
+    '"derechos de la naturaleza"',
+    '"personería ambiental"',
+    '"derechos de los ecosistemas"',
+    '"personalidad jurídica de la naturaleza"',
+    '"derechos de los seres no humanos"',
+    # River rights
     '"river rights"',
     '"rights of rivers"',
+    '"derechos de los ríos"',
+    '"ríos con derechos"',
+    # Earth law
     '"Earth law"',
     '"Earth jurisprudence"',
     '"legal guardianship of nature"',
     '"environmental guardianship"',
+    '"derecho de la Tierra"',
+    '"jurisprudencia de la Tierra"',
+    '"tutela legal de la naturaleza"',
+    '"guardianes legales de la naturaleza"',
+    # Indigenous environmental rights
     '"Indigenous environmental rights"',
     '"Indigenous land rights"',
     '"free prior informed consent"',
     '"Indigenous environmental justice"',
     '"biocultural rights"',
+    '"derechos ambientales indígenas"',
+    '"derechos territoriales indígenas"',
+    '"consentimiento libre previo e informado"',
+    '"justicia ambiental indígena"',
+    '"derechos bioculturales"',
+    # Ecocide
     '"ecocide"',
+    '"ecocidio"',
+    # Rights of future generations
     '"rights of future generations"',
+    '"derechos de las generaciones futuras"',
+    # Right to a healthy environment
     '"right to a healthy environment"',
     '"Green Amendments"',
+    '"derecho a un medio ambiente sano"',
+    # Bioregionalism
     '"bioregionalism"',
+    '"bioregionalismo"',
 ]
 
 
@@ -84,23 +112,46 @@ def fetch_and_parse_article(url):
 # Search terms and DB records are unchanged; this only affects tile grouping.
 TAG_CONSOLIDATION = {
     # Rights of Nature tile
-    '"environmental personhood"':         '"Rights of Nature"',
-    '"ecosystem rights"':                 '"Rights of Nature"',
-    '"ecological personhood"':            '"Rights of Nature"',
-    '"nonhuman rights legal"':            '"Rights of Nature"',
+    '"environmental personhood"':                    '"Rights of Nature"',
+    '"ecosystem rights"':                            '"Rights of Nature"',
+    '"ecological personhood"':                       '"Rights of Nature"',
+    '"nonhuman rights legal"':                       '"Rights of Nature"',
+    '"derechos de la naturaleza"':                   '"Rights of Nature"',
+    '"personería ambiental"':                        '"Rights of Nature"',
+    '"derechos de los ecosistemas"':                 '"Rights of Nature"',
+    '"personalidad jurídica de la naturaleza"':      '"Rights of Nature"',
+    '"derechos de los seres no humanos"':            '"Rights of Nature"',
     # River rights tile
-    '"rights of rivers"':                 '"river rights"',
+    '"rights of rivers"':                            '"river rights"',
+    '"derechos de los ríos"':                        '"river rights"',
+    '"ríos con derechos"':                           '"river rights"',
     # Earth law tile
-    '"Earth jurisprudence"':              '"Earth law"',
-    '"legal guardianship of nature"':     '"Earth law"',
-    '"environmental guardianship"':       '"Earth law"',
+    '"Earth jurisprudence"':                         '"Earth law"',
+    '"legal guardianship of nature"':                '"Earth law"',
+    '"environmental guardianship"':                  '"Earth law"',
+    '"derecho de la Tierra"':                        '"Earth law"',
+    '"jurisprudencia de la Tierra"':                 '"Earth law"',
+    '"tutela legal de la naturaleza"':               '"Earth law"',
+    '"guardianes legales de la naturaleza"':         '"Earth law"',
     # Indigenous environmental rights tile
-    '"Indigenous land rights"':           '"Indigenous environmental rights"',
-    '"free prior informed consent"':      '"Indigenous environmental rights"',
-    '"Indigenous environmental justice"': '"Indigenous environmental rights"',
-    '"biocultural rights"':               '"Indigenous environmental rights"',
+    '"Indigenous land rights"':                      '"Indigenous environmental rights"',
+    '"free prior informed consent"':                 '"Indigenous environmental rights"',
+    '"Indigenous environmental justice"':            '"Indigenous environmental rights"',
+    '"biocultural rights"':                          '"Indigenous environmental rights"',
+    '"derechos ambientales indígenas"':              '"Indigenous environmental rights"',
+    '"derechos territoriales indígenas"':            '"Indigenous environmental rights"',
+    '"consentimiento libre previo e informado"':     '"Indigenous environmental rights"',
+    '"justicia ambiental indígena"':                 '"Indigenous environmental rights"',
+    '"derechos bioculturales"':                      '"Indigenous environmental rights"',
+    # Ecocide tile
+    '"ecocidio"':                                    '"ecocide"',
+    # Rights of future generations tile
+    '"derechos de las generaciones futuras"':        '"rights of future generations"',
     # Right to a healthy environment tile
-    '"Green Amendments"':                 '"right to a healthy environment"',
+    '"Green Amendments"':                            '"right to a healthy environment"',
+    '"derecho a un medio ambiente sano"':            '"right to a healthy environment"',
+    # Bioregionalism tile
+    '"bioregionalismo"':                             '"bioregionalism"',
 }
 
 

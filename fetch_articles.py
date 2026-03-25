@@ -19,27 +19,55 @@ from newspaper import Article as NewsArticle
 from db import load_articles, save_articles, get_existing_urls, init_db
 
 SEARCH_TERMS = [
+    # Rights of Nature
     '"Rights of Nature"',
     '"environmental personhood"',
     '"ecosystem rights"',
     '"ecological personhood"',
     '"nonhuman rights legal"',
+    '"derechos de la naturaleza"',
+    '"personería ambiental"',
+    '"derechos de los ecosistemas"',
+    '"personalidad jurídica de la naturaleza"',
+    '"derechos de los seres no humanos"',
+    # River rights
     '"river rights"',
     '"rights of rivers"',
+    '"derechos de los ríos"',
+    '"ríos con derechos"',
+    # Earth law
     '"Earth law"',
     '"Earth jurisprudence"',
     '"legal guardianship of nature"',
     '"environmental guardianship"',
+    '"derecho de la Tierra"',
+    '"jurisprudencia de la Tierra"',
+    '"tutela legal de la naturaleza"',
+    '"guardianes legales de la naturaleza"',
+    # Indigenous environmental rights
     '"Indigenous environmental rights"',
     '"Indigenous land rights"',
     '"free prior informed consent"',
     '"Indigenous environmental justice"',
     '"biocultural rights"',
+    '"derechos ambientales indígenas"',
+    '"derechos territoriales indígenas"',
+    '"consentimiento libre previo e informado"',
+    '"justicia ambiental indígena"',
+    '"derechos bioculturales"',
+    # Ecocide
     '"ecocide"',
+    '"ecocidio"',
+    # Rights of future generations
     '"rights of future generations"',
+    '"derechos de las generaciones futuras"',
+    # Right to a healthy environment
     '"right to a healthy environment"',
     '"Green Amendments"',
+    '"derecho a un medio ambiente sano"',
+    # Bioregionalism
     '"bioregionalism"',
+    '"bioregionalismo"',
 ]
 
 GOOGLE_NEWS_RSS = "https://news.google.com/rss/search?q={query}&hl=en&gl=US&ceid=US:en"
@@ -149,7 +177,7 @@ def main():
     print(f"[{datetime.now().isoformat()}] Fetching Earth law articles...")
 
     existing_urls, existing_real_urls = get_existing_urls()
-    cutoff = datetime.now(tz=timezone.utc) - timedelta(days=365)
+    cutoff = datetime.now(tz=timezone.utc) - timedelta(days=180)
 
     new_articles = []
 
