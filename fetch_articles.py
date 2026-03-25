@@ -70,7 +70,8 @@ SEARCH_TERMS = [
     '"bioregionalismo"',
 ]
 
-GOOGLE_NEWS_RSS = "https://news.google.com/rss/search?q={query}&hl=en&gl=US&ceid=US:en"
+GOOGLE_NEWS_RSS_EN = "https://news.google.com/rss/search?q={query}&hl=en&gl=US&ceid=US:en"
+GOOGLE_NEWS_RSS_ES = "https://news.google.com/rss/search?q={query}&hl=es&gl=ES&ceid=ES:es"
 
 
 def make_id(url):
@@ -141,8 +142,14 @@ def extract_author(url):
     return ""
 
 
+def is_spanish_term(term):
+    """Return True if the term contains Spanish-specific characters."""
+    return any(c in term for c in "áéíóúüñ¿¡ÁÉÍÓÚÜÑ")
+
+
 def fetch_for_term(term):
-    url = GOOGLE_NEWS_RSS.format(query=quote(term))
+    template = GOOGLE_NEWS_RSS_ES if is_spanish_term(term) else GOOGLE_NEWS_RSS_EN
+    url = template.format(query=quote(term))
     feed = feedparser.parse(url)
     results = []
 
