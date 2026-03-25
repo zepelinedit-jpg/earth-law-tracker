@@ -6,4 +6,3 @@ langdetect==1.0.9
 lxml[html_clean]==5.1.0
 googlenewsdecoder==0.1.7
 psycopg2-binary==2.9.9
-gunicorn==21.2.0
