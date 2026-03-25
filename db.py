@@ -1,15 +1,42 @@
 """Database layer for Earth Law Tracker.
 
-Uses PostgreSQL when DATABASE_URL is set (production on Render),
-falls back to a local JSON file for development.
+Uses SQLite by default (articles.db in the project directory).
+Falls back to PostgreSQL if DATABASE_URL is set to a postgresql:// URL.
 """
 
-import json
 import os
+import sqlite3
 
 DATA_DIR = os.path.dirname(os.path.abspath(__file__))
-ARTICLES_FILE = os.path.join(DATA_DIR, "articles.json")
-DATABASE_URL = os.environ.get("DATABASE_URL")
+SQLITE_PATH = os.environ.get("SQLITE_PATH", os.path.join(DATA_DIR, "articles.db"))
+DATABASE_URL = os.environ.get("DATABASE_URL", "")
+
+COLUMNS = [
+    "id", "url", "real_url", "title", "title_en",
+    "outlet", "outlet_en", "author", "date", "language",
+    "search_term", "fetched_date",
+]
+
+CREATE_TABLE_SQL = """
+    CREATE TABLE IF NOT EXISTS articles (
+        id TEXT PRIMARY KEY,
+        url TEXT NOT NULL,
+        real_url TEXT,
+        title TEXT,
+        title_en TEXT,
+        outlet TEXT,
+        outlet_en TEXT,
+        author TEXT DEFAULT '',
+        date TEXT,
+        language TEXT DEFAULT 'en',
+        search_term TEXT,
+        fetched_date TEXT
+    )
+"""
+
+
+def _use_postgres():
+    return DATABASE_URL.startswith("postgresql")
 
 
 def _get_pg_conn():
@@ -17,97 +44,93 @@ def _get_pg_conn():
     return psycopg2.connect(DATABASE_URL)
 
 
+def _get_sqlite_conn():
+    conn = sqlite3.connect(SQLITE_PATH)
+    conn.row_factory = sqlite3.Row
+    return conn
+
+
 def init_db():
-    """Create the articles table if using PostgreSQL."""
-    if not DATABASE_URL:
-        return
-    conn = _get_pg_conn()
-    cur = conn.cursor()
-    cur.execute("""
-        CREATE TABLE IF NOT EXISTS articles (
-            id TEXT PRIMARY KEY,
-            url TEXT NOT NULL,
-            real_url TEXT,
-            title TEXT,
-            title_en TEXT,
-            outlet TEXT,
-            outlet_en TEXT,
-            author TEXT DEFAULT '',
-            date TEXT,
-            language TEXT DEFAULT 'en',
-            search_term TEXT,
-            fetched_date TEXT
-        )
-    """)
-    conn.commit()
-    cur.close()
-    conn.close()
-
-
-def load_articles():
-    if DATABASE_URL:
+    if _use_postgres():
         conn = _get_pg_conn()
         cur = conn.cursor()
-        cur.execute("SELECT id, url, real_url, title, title_en, outlet, outlet_en, author, date, language, search_term, fetched_date FROM articles")
-        columns = ["id", "url", "real_url", "title", "title_en", "outlet", "outlet_en", "author", "date", "language", "search_term", "fetched_date"]
-        articles = [dict(zip(columns, row)) for row in cur.fetchall()]
-        cur.close()
-        conn.close()
-        return articles
-    else:
-        if os.path.exists(ARTICLES_FILE):
-            with open(ARTICLES_FILE, "r", encoding="utf-8") as f:
-                return json.load(f)
-        return []
-
-
-def save_articles(articles):
-    if DATABASE_URL:
-        conn = _get_pg_conn()
-        cur = conn.cursor()
-        for a in articles:
-            cur.execute("""
-                INSERT INTO articles (id, url, real_url, title, title_en, outlet, outlet_en, author, date, language, search_term, fetched_date)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-                ON CONFLICT (id) DO UPDATE SET author = EXCLUDED.author
-            """, (
-                a.get("id"), a.get("url"), a.get("real_url"),
-                a.get("title"), a.get("title_en"),
-                a.get("outlet"), a.get("outlet_en"),
-                a.get("author", ""), a.get("date"),
-                a.get("language", "en"), a.get("search_term"),
-                a.get("fetched_date"),
-            ))
+        cur.execute(CREATE_TABLE_SQL)
         conn.commit()
         cur.close()
         conn.close()
     else:
-        with open(ARTICLES_FILE, "w", encoding="utf-8") as f:
-            json.dump(articles, f, indent=2, ensure_ascii=False)
+        conn = _get_sqlite_conn()
+        conn.execute(CREATE_TABLE_SQL)
+        conn.commit()
+        conn.close()
+
+
+def load_articles():
+    if _use_postgres():
+        conn = _get_pg_conn()
+        cur = conn.cursor()
+        cur.execute(f"SELECT {', '.join(COLUMNS)} FROM articles")
+        articles = [dict(zip(COLUMNS, row)) for row in cur.fetchall()]
+        cur.close()
+        conn.close()
+    else:
+        conn = _get_sqlite_conn()
+        cur = conn.execute(f"SELECT {', '.join(COLUMNS)} FROM articles")
+        articles = [dict(row) for row in cur.fetchall()]
+        conn.close()
+    return articles
+
+
+def save_articles(articles):
+    placeholders = ", ".join("?" * len(COLUMNS))
+    col_list = ", ".join(COLUMNS)
+
+    if _use_postgres():
+        pg_placeholders = ", ".join(f"%s" for _ in COLUMNS)
+        conn = _get_pg_conn()
+        cur = conn.cursor()
+        for a in articles:
+            cur.execute(
+                f"""INSERT INTO articles ({col_list})
+                    VALUES ({pg_placeholders})
+                    ON CONFLICT (id) DO UPDATE SET author = EXCLUDED.author""",
+                tuple(a.get(c) or "" for c in COLUMNS),
+            )
+        conn.commit()
+        cur.close()
+        conn.close()
+    else:
+        conn = _get_sqlite_conn()
+        for a in articles:
+            conn.execute(
+                f"""INSERT INTO articles ({col_list})
+                    VALUES ({placeholders})
+                    ON CONFLICT(id) DO UPDATE SET author = excluded.author""",
+                tuple(a.get(c) or "" for c in COLUMNS),
+            )
+        conn.commit()
+        conn.close()
 
 
 def get_existing_urls():
-    if DATABASE_URL:
+    if _use_postgres():
         conn = _get_pg_conn()
         cur = conn.cursor()
         cur.execute("SELECT url, real_url FROM articles")
         rows = cur.fetchall()
         cur.close()
         conn.close()
-        urls = {r[0] for r in rows}
-        real_urls = {r[1] for r in rows if r[1]}
-        return urls, real_urls
     else:
-        articles = load_articles()
-        urls = {a["url"] for a in articles}
-        real_urls = {a.get("real_url", "") for a in articles if a.get("real_url")}
-        return urls, real_urls
+        conn = _get_sqlite_conn()
+        rows = conn.execute("SELECT url, real_url FROM articles").fetchall()
+        conn.close()
+    urls = {r[0] for r in rows}
+    real_urls = {r[1] for r in rows if r[1]}
+    return urls, real_urls
 
 
 def delete_old_articles(cutoff_date_str):
-    """Remove articles older than cutoff. For PostgreSQL, delete directly."""
-    if DATABASE_URL:
-        # For PG, we handle this in the save/cleanup step
+    if _use_postgres():
         conn = _get_pg_conn()
         cur = conn.cursor()
         cur.execute("DELETE FROM articles WHERE date < %s", (cutoff_date_str,))
@@ -115,5 +138,10 @@ def delete_old_articles(cutoff_date_str):
         conn.commit()
         cur.close()
         conn.close()
-        return deleted
-    return 0
+    else:
+        conn = _get_sqlite_conn()
+        cur = conn.execute("DELETE FROM articles WHERE date < ?", (cutoff_date_str,))
+        deleted = cur.rowcount
+        conn.commit()
+        conn.close()
+    return deleted
