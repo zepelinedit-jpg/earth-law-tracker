@@ -1,24 +1,20 @@
-"""Migrate articles from Render PostgreSQL to local SQLite.
+"""Migrate articles from articles.json to local SQLite.
 
-Run this locally with DATABASE_URL set to the Render connection string:
+Run from the project directory:
 
-    DATABASE_URL="postgresql://..." python3 migrate_to_sqlite.py
+    python3 migrate_to_sqlite.py
 
 The SQLite database will be written to articles.db in the project directory
 (or to SQLITE_PATH if that env var is set).
 """
 
+import json
 import os
-import sys
 import sqlite3
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "")
-if not DATABASE_URL.startswith("postgresql"):
-    sys.exit("ERROR: Set DATABASE_URL to a postgresql:// connection string before running.")
-
-import psycopg2
-
-SQLITE_PATH = os.environ.get("SQLITE_PATH", os.path.join(os.path.dirname(os.path.abspath(__file__)), "articles.db"))
+DATA_DIR = os.path.dirname(os.path.abspath(__file__))
+SQLITE_PATH = os.environ.get("SQLITE_PATH", os.path.join(DATA_DIR, "articles.db"))
+JSON_PATH = os.path.join(DATA_DIR, "articles.json")
 
 COLUMNS = [
     "id", "url", "real_url", "title", "title_en",
@@ -43,14 +39,10 @@ CREATE_TABLE_SQL = """
     )
 """
 
-print(f"Connecting to PostgreSQL...")
-pg_conn = psycopg2.connect(DATABASE_URL)
-pg_cur = pg_conn.cursor()
-pg_cur.execute(f"SELECT {', '.join(COLUMNS)} FROM articles")
-rows = pg_cur.fetchall()
-pg_cur.close()
-pg_conn.close()
-print(f"Fetched {len(rows)} articles from PostgreSQL.")
+print(f"Reading {JSON_PATH}...")
+with open(JSON_PATH) as f:
+    articles = json.load(f)
+print(f"Loaded {len(articles)} articles from JSON.")
 
 print(f"Writing to SQLite: {SQLITE_PATH}")
 sq_conn = sqlite3.connect(SQLITE_PATH)
@@ -59,14 +51,14 @@ sq_conn.execute(CREATE_TABLE_SQL)
 col_list = ", ".join(COLUMNS)
 placeholders = ", ".join("?" * len(COLUMNS))
 
-for row in rows:
+for a in articles:
     sq_conn.execute(
         f"""INSERT INTO articles ({col_list})
             VALUES ({placeholders})
             ON CONFLICT(id) DO UPDATE SET author = excluded.author""",
-        tuple(v or "" for v in row),
+        tuple(a.get(c) or "" for c in COLUMNS),
     )
 
 sq_conn.commit()
 sq_conn.close()
-print(f"Done. {len(rows)} articles written to {SQLITE_PATH}.")
+print(f"Done. {len(articles)} articles written to {SQLITE_PATH}.")
