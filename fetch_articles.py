@@ -30,6 +30,9 @@ SEARCH_TERMS = [
     '"derechos de los ecosistemas"',
     '"personalidad jurídica de la naturaleza"',
     '"derechos de los seres no humanos"',
+    '"derechos para la naturaleza"',
+    '"personería jurídica de la naturaleza"',
+    '"guardianía ambiental"',
     # River rights
     '"river rights"',
     '"rights of rivers"',
@@ -68,6 +71,8 @@ SEARCH_TERMS = [
     # Bioregionalism
     '"bioregionalism"',
     '"bioregionalismo"',
+    '"regionalismo ecológico"',
+    '"eco-regionalismo"',
 ]
 
 GOOGLE_NEWS_RSS_EN = "https://news.google.com/rss/search?q={query}&hl=en&gl=US&ceid=US:en"
