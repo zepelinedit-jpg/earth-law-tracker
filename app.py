@@ -34,7 +34,7 @@ SEARCH_TERMS = [
     '"derechos de los ríos"',
     '"ríos con derechos"',
     # Earth law
-    '"Earth law"',
+    '"Earth Law Center"',
     '"Earth jurisprudence"',
     '"legal guardianship of nature"',
     '"environmental guardianship"',
@@ -125,14 +125,15 @@ TAG_CONSOLIDATION = {
     '"rights of rivers"':                            '"river rights"',
     '"derechos de los ríos"':                        '"river rights"',
     '"ríos con derechos"':                           '"river rights"',
-    # Earth law tile
-    '"Earth jurisprudence"':                         '"Earth law"',
-    '"legal guardianship of nature"':                '"Earth law"',
-    '"environmental guardianship"':                  '"Earth law"',
-    '"derecho de la Tierra"':                        '"Earth law"',
-    '"jurisprudencia de la Tierra"':                 '"Earth law"',
-    '"tutela legal de la naturaleza"':               '"Earth law"',
-    '"guardianes legales de la naturaleza"':         '"Earth law"',
+    # Earth law → Rights of Nature tile
+    '"Earth Law Center"':                            '"Rights of Nature"',
+    '"Earth jurisprudence"':                         '"Rights of Nature"',
+    '"legal guardianship of nature"':                '"Rights of Nature"',
+    '"environmental guardianship"':                  '"Rights of Nature"',
+    '"derecho de la Tierra"':                        '"Rights of Nature"',
+    '"jurisprudencia de la Tierra"':                 '"Rights of Nature"',
+    '"tutela legal de la naturaleza"':               '"Rights of Nature"',
+    '"guardianes legales de la naturaleza"':         '"Rights of Nature"',
     # Indigenous environmental rights tile
     '"Indigenous land rights"':                      '"Indigenous environmental rights"',
     '"free prior informed consent"':                 '"Indigenous environmental rights"',

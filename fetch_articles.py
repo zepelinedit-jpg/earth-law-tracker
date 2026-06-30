@@ -39,7 +39,7 @@ SEARCH_TERMS = [
     '"derechos de los ríos"',
     '"ríos con derechos"',
     # Earth law
-    '"Earth law"',
+    '"Earth Law Center"',
     '"Earth jurisprudence"',
     '"legal guardianship of nature"',
     '"environmental guardianship"',
