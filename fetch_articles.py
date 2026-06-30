@@ -75,6 +75,10 @@ SEARCH_TERMS = [
     '"eco-regionalismo"',
 ]
 
+EXCLUDE_TERMS = [
+    "cryptocurrency",
+]
+
 GOOGLE_NEWS_RSS_EN = "https://news.google.com/rss/search?q={query}&hl=en&gl=US&ceid=US:en"
 GOOGLE_NEWS_RSS_ES = "https://news.google.com/rss/search?q={query}&hl=es&gl=ES&ceid=ES:es"
 
@@ -208,6 +212,10 @@ def main():
                     continue
             except Exception:
                 pass
+
+            title_lower = article["title"].lower()
+            if any(term in title_lower for term in EXCLUDE_TERMS):
+                continue
 
             existing_urls.add(article["url"])
 
